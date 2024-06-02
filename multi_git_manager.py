@@ -46,11 +46,9 @@ def add_ssh_key_to_agent(key_path):
     run_command("eval $(ssh-agent -s)")
     run_command(f'ssh-add {key_path}')
 
-def configure_repository(repo_path, host, username, email):
-    os.chdir(repo_path)
-    run_command(f'git remote set-url origin git@{host}:{username}/repo.git')
-    run_command(f'git config user.name "{username}"')
-    run_command(f'git config user.email "{email}"')
+def set_global_git_user(username, email):
+    run_command(f'git config --global user.name "{username}"')
+    run_command(f'git config --global user.email "{email}"')
 
 def list_users(config):
     for vendor in config.sections():
@@ -113,7 +111,6 @@ def main():
     parser_switch = subparsers.add_parser('switch', help='Switch to a different user')
     parser_switch.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
     parser_switch.add_argument('username', type=str, help='Git username')
-    parser_switch.add_argument('repo_path', type=str, help='Path to the repository')
 
     # Delete user command
     parser_delete = subparsers.add_parser('delete', help='Delete a user')
@@ -141,9 +138,9 @@ def main():
 
     elif args.command == 'switch':
         if args.vendor in config and args.username in config[args.vendor]:
-            email, key_path = config[vendor][args.username].split(',')
+            email, key_path = config[args.vendor][args.username].split(',')
             add_ssh_key_to_agent(key_path)
-            configure_repository(args.repo_path, f"{args.vendor}.com", args.username, email)
+            set_global_git_user(args.username, email)
             print(f"Switched to user {args.username} for vendor {args.vendor}.")
         else:
             print(f"User {args.username} not found for vendor {args.vendor}.")
