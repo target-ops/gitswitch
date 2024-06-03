@@ -41,7 +41,6 @@ def delete_user(config, vendor, username):
         raise Exception(f"User {username} not found for vendor {vendor}")
 
 def generate_ssh_key(email, key_path):
-    print(f'ssh-keygen -b 4096 -t rsa -C "{email}" -f {key_path} -N ""')
     run_command(f'ssh-keygen -b 4096 -t rsa -C "{email}" -f {key_path} -N ""')
 
 def set_global_git_user(username, email):
@@ -50,6 +49,8 @@ def set_global_git_user(username, email):
 
 def list_users(config):
     for vendor in config.sections():
+        if vendor == "current":
+            continue
         print(f"{vendor}:")
         for username in config[vendor]:
             email, key_path = config[vendor][username].split(',')
@@ -96,6 +97,21 @@ Host {vendor}.com
     with open(SSH_CONFIG_FILE, 'w') as f:
         f.write(host_entry)
 
+def set_current_user(config, vendor, username):
+    if 'current' not in config:
+        config['current'] = {}
+    config['current']['vendor'] = vendor
+    config['current']['username'] = username
+    save_config(config)
+
+def get_current_user(config):
+    if 'current' in config:
+        vendor = config['current']['vendor']
+        username = config['current']['username']
+        return vendor, username
+    else:
+        return None, None
+
 def main():
     parser = argparse.ArgumentParser(description='Manage multiple Git users for different vendors.')
     subparsers = parser.add_subparsers(dest='command')
@@ -126,6 +142,9 @@ def main():
     parser_delete.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
     parser_delete.add_argument('username', type=str, help='Git username')
 
+    # Current user command
+    parser_current = subparsers.add_parser('current', help='Show current active user')
+
     args = parser.parse_args()
 
     config = load_config()
@@ -149,6 +168,7 @@ def main():
             email, key_path = config[args.vendor][args.username].split(',')
             set_global_git_user(args.username, email)
             update_ssh_config(args.vendor, key_path)
+            set_current_user(config, args.vendor, args.username)
             print(f"Switched to user {args.username} for vendor {args.vendor}.")
         else:
             print(f"User {args.username} not found for vendor {args.vendor}.")
@@ -159,6 +179,13 @@ def main():
             print(f"User {args.username} deleted for vendor {args.vendor}.")
         except Exception as e:
             print(e)
+
+    elif args.command == 'current':
+        vendor, username = get_current_user(config)
+        if vendor and username:
+            print(f"Current active user: {username} for vendor {vendor}")
+        else:
+            print("No active user set.")
 
 if __name__ == "__main__":
     main()
