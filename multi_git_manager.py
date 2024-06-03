@@ -6,6 +6,7 @@ import requests
 import getpass
 
 CONFIG_FILE = 'config.ini'
+SSH_CONFIG_FILE = os.path.expanduser('~/.ssh/config')
 
 def run_command(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -40,8 +41,8 @@ def delete_user(config, vendor, username):
         raise Exception(f"User {username} not found for vendor {vendor}")
 
 def generate_ssh_key(email, key_path):
-    print(f'ssh-keygen -t ed25519 -C "{email}" -f {key_path} -N "y"')
-    run_command(f'ssh-keygen -t ed25519 -C "{email}" -f {key_path} -N "y"')
+    print(f'ssh-keygen -b 4096 -t rsa -C "{email}" -f {key_path} -N ""')
+    run_command(f'ssh-keygen -b 4096 -t rsa -C "{email}" -f {key_path} -N ""')
 
 def set_global_git_user(username, email):
     run_command(f'git config --global user.name "{username}"')
@@ -56,7 +57,6 @@ def list_users(config):
 
 def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
     public_key_path = f"{key_path}.pub"
-    print(public_key_path)
     if not os.path.isfile(public_key_path):
         raise FileNotFoundError(f"The public key file {public_key_path} does not exist.")
 
@@ -84,6 +84,17 @@ def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
     else:
         print(f"Failed to upload public key: {response.status_code}")
         print(response.json())
+
+def update_ssh_config(vendor, key_path):
+    host_entry = f"""
+Host {vendor}.com
+    HostName {vendor}.com
+    PreferredAuthentications publickey
+    IdentityFile {key_path}
+    """
+
+    with open(SSH_CONFIG_FILE, 'w') as f:
+        f.write(host_entry)
 
 def main():
     parser = argparse.ArgumentParser(description='Manage multiple Git users for different vendors.')
@@ -137,6 +148,7 @@ def main():
         if args.vendor in config and args.username in config[args.vendor]:
             email, key_path = config[args.vendor][args.username].split(',')
             set_global_git_user(args.username, email)
+            update_ssh_config(args.vendor, key_path)
             print(f"Switched to user {args.username} for vendor {args.vendor}.")
         else:
             print(f"User {args.username} not found for vendor {args.vendor}.")
