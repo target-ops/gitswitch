@@ -40,11 +40,8 @@ def delete_user(config, vendor, username):
         raise Exception(f"User {username} not found for vendor {vendor}")
 
 def generate_ssh_key(email, key_path):
-    run_command(f'ssh-keygen -t ed25519 -C "{email}" -f {key_path} -N ""')
-
-def add_ssh_key_to_agent(key_path):
-    run_command("eval $(ssh-agent -s)")
-    run_command(f'ssh-add {key_path}')
+    print(f'ssh-keygen -t ed25519 -C "{email}" -f {key_path} -N "y"')
+    run_command(f'ssh-keygen -t ed25519 -C "{email}" -f {key_path} -N "y"')
 
 def set_global_git_user(username, email):
     run_command(f'git config --global user.name "{username}"')
@@ -59,6 +56,7 @@ def list_users(config):
 
 def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
     public_key_path = f"{key_path}.pub"
+    print(public_key_path)
     if not os.path.isfile(public_key_path):
         raise FileNotFoundError(f"The public key file {public_key_path} does not exist.")
 
@@ -130,8 +128,7 @@ def main():
 
     elif args.command == 'generate-key':
         generate_ssh_key(args.email, args.key_path)
-        add_ssh_key_to_agent(args.key_path)
-        print(f"SSH key generated and added to agent for {args.email}.")
+        print(f"SSH key generated for {args.email}.")
 
     elif args.command == 'list':
         list_users(config)
@@ -139,7 +136,6 @@ def main():
     elif args.command == 'switch':
         if args.vendor in config and args.username in config[args.vendor]:
             email, key_path = config[args.vendor][args.username].split(',')
-            add_ssh_key_to_agent(key_path)
             set_global_git_user(args.username, email)
             print(f"Switched to user {args.username} for vendor {args.vendor}.")
         else:
