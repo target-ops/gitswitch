@@ -13,7 +13,7 @@ setup(
     package_dir={'': 'src'},
     entry_points={
         'console_scripts': [
-            'git-user-manager=feature/setupPy:feature/setupPy',
+            'git-user-manager=main:main',
         ],
     },
     install_requires=[

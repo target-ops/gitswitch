@@ -22,6 +22,3 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.setuptools.console-scripts]
-git-user-manager = "feature/setupPy:feature/setupPy"
