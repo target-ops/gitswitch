@@ -1,15 +1,27 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "GitSwitch"
+name = "git-user-manager"
 version = "0.0.1"
-description = "A small example package"
+description = "Manage multiple Git users for different vendors."
+authors = [
+    { name = "ofirhaim", email = "ofir474@gmail.com" },
+]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.6"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    # List your dependencies here
+]
 
-[project.urls]
-Homepage = "https://github.com/target-ops/GitSwitch"
-Issues = "https://github.com/target-ops/GitSwitch/issues"
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.console-scripts]
+git-user-manager = "main:main"
