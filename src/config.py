@@ -7,6 +7,12 @@ def load_config():
     config = configparser.ConfigParser()
     if os.path.exists(CONFIG_FILE):
         config.read(CONFIG_FILE)
+    if not os.path.exists(CONFIG_FILE):
+        # Create the file if it doesn't exist
+        with open(CONFIG_FILE, 'w') as file:
+            config.write(file)
+    # Read the config file
+    config.read(CONFIG_FILE)
     return config
 
 def save_config(config):
