@@ -1,8 +1,8 @@
 import argparse
 import getpass
-from .config import load_config, set_current_user, get_current_user
-from .ssh import generate_ssh_key, update_ssh_config
-from .git import set_global_git_user, add_user, delete_user, list_users, upload_ssh_key_to_vendor
+from config import load_config, set_current_user, get_current_user
+from ssh import generate_ssh_key, update_ssh_config
+from git import set_global_git_user, add_user, delete_user, list_users, upload_ssh_key_to_vendor
 
 def main():
     parser = argparse.ArgumentParser(description='Manage multiple Git users for different vendors.')
