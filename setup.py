@@ -12,6 +12,17 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     entry_points={
-        'console_scripts': ['GitSwitch=GitSwitch.src.main.py:main']
-    }
+        'console_scripts': [
+            'git-user-manager=main:main',
+        ],
+    },
+    install_requires=[
+        # List your dependencies here
+    ],
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+    ],
+    python_requires='>=3.6',
 )
