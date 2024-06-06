@@ -1,5 +1,6 @@
 import argparse
 import getpass
+import argcomplete 
 from config import load_config, set_current_user, get_current_user
 from ssh import generate_ssh_key, update_ssh_config
 from git import set_global_git_user, add_user, delete_user, list_users, upload_ssh_key_to_vendor
@@ -30,7 +31,7 @@ Examples:
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     subparsers = parser.add_subparsers(dest='command')
-
+    
     # Add user command
     parser_add = subparsers.add_parser('add',help='Add a new user')
     parser_add.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
@@ -60,6 +61,8 @@ Examples:
     # Current user command
     parser_current = subparsers.add_parser('current', help='Show current active user')
 
+
+    argcomplete.autocomplete(parser) 
     args = parser.parse_args()
 
     config = load_config()
