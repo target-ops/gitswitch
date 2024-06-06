@@ -4,16 +4,19 @@ from utils import run_command
 from config import save_config
 
 def set_global_git_user(username, email):
+    """Function set_global_git_user."""
     run_command(f'git config --global user.name "{username}"')
     run_command(f'git config --global user.email "{email}"')
 
 def add_user(config, vendor, username, email, key_path):
+    """Function add user."""
     if vendor not in config:
         config[vendor] = {}
     config[vendor][username] = f"{email},{key_path}"
     save_config(config)
 
 def delete_user(config, vendor, username):
+    """Function delete_user."""
     if vendor in config and username in config[vendor]:
         del config[vendor][username]
         if not config[vendor]:
@@ -23,6 +26,7 @@ def delete_user(config, vendor, username):
         raise Exception(f"User {username} not found for vendor {vendor}")
 
 def list_users(config):
+    """Function list_users."""
     for vendor in config.sections():
         if vendor == "current":
             continue
@@ -32,6 +36,7 @@ def list_users(config):
             print(f"  Username: {username}, Email: {email}, SSH Key: {key_path}")
 
 def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
+    """Function upload_ssh_key_to_vendor."""
     public_key_path = f"{key_path}.pub"
     if not os.path.isfile(public_key_path):
         raise FileNotFoundError(f"The public key file {public_key_path} does not exist.")
