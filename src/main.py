@@ -9,7 +9,7 @@ def main():
     subparsers = parser.add_subparsers(dest='command')
 
     # Add user command
-    parser_add = subparsers.add_parser('add', aliases=['-a'],help='Add a new user')
+    parser_add = subparsers.add_parser('add',help='Add a new user')
     parser_add.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
     parser_add.add_argument('username', type=str, help='Git username')
     parser_add.add_argument('email', type=str, help='User email')
@@ -22,21 +22,20 @@ def main():
     parser_generate.add_argument('key_path', type=str, help='Path to store the SSH key')
 
     # List users command
-    parser_list = subparsers.add_parser('list', aliases=['l'],help='List all users')
-    print(parser_list)
+    parser_list = subparsers.add_parser('list',help='List all users')
 
     # Switch user command
-    parser_switch = subparsers.add_parser('switch', aliases=['s'],help='Switch to a different user')
+    parser_switch = subparsers.add_parser('switch',help='Switch to a different user')
     parser_switch.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
     parser_switch.add_argument('username', type=str, help='Git username')
 
     # Delete user command
-    parser_delete = subparsers.add_parser('delete', aliases=['d'], help='Delete a user')
+    parser_delete = subparsers.add_parser('delete', help='Delete a user')
     parser_delete.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
     parser_delete.add_argument('username', type=str, help='Git username')
 
     # Current user command
-    parser_current = subparsers.add_parser('current', aliases=['c'], help='Show current active user')
+    parser_current = subparsers.add_parser('current', help='Show current active user')
 
     args = parser.parse_args()
 
@@ -44,7 +43,6 @@ def main():
 
     if args.command is None:
         parser.print_help()
-
 
     if args.command == 'add':
         add_user(config, args.vendor, args.username, args.email, args.key_path)
