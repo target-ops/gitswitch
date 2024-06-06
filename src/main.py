@@ -5,7 +5,30 @@ from ssh import generate_ssh_key, update_ssh_config
 from git import set_global_git_user, add_user, delete_user, list_users, upload_ssh_key_to_vendor
 
 def main():
-    parser = argparse.ArgumentParser(description='Manage multiple Git users for different vendors.')
+    parser = argparse.ArgumentParser(
+        description='Manage multiple Git users for different vendors.',
+        epilog="""
+Examples:
+    # Add a new user
+    gitswitch add github myusername myemail@example.com /path/to/key
+
+    # Generate a new SSH key
+    gitswitch generate-key myemail@example.com /path/to/key
+
+    # List all users
+    gitswitch list
+
+    # Switch to a different user
+    gitswitch switch github myusername
+
+    # Delete a user
+    gitswitch delete github myusername
+
+    # Show current active user
+    gitswitch current
+    """,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     subparsers = parser.add_subparsers(dest='command')
 
     # Add user command
