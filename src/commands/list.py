@@ -15,6 +15,6 @@ class ListCommand:
 
     def execute(self, args):
         try:
-            self.git_config.list_users(self.config.load)
+            self.git_config.list_users(self.config.load())
         except Exception as e:
             logger.error(f"Error listing users: {e}")

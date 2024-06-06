@@ -17,7 +17,7 @@ class DeleteCommand:
 
     def execute(self, args):
         try:
-            self.git_config.delete_user(self.config.load, args.vendor, args.username)
+            self.git_config.delete_user(self.config.load(), args.vendor, args.username)
             logger.info(f"User {args.username} deleted for vendor {args.vendor}.")
         except Exception as e:
             logger.error(f"Error deleting user: {e}")

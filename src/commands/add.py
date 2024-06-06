@@ -21,7 +21,7 @@ class AddCommand:
 
     def execute(self, args):
         try:
-            self.git_config.add_user(self.config.load, args.vendor, args.username, args.email, args.key_path)
+            self.git_config.add_user(self.config.load(), args.vendor, args.username, args.email, args.key_path)
             logger.info(f"User {args.username} added for vendor {args.vendor}.")
             if args.upload_key:
                 token = getpass.getpass(f"Enter your {args.vendor} personal access token: ")

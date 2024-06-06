@@ -18,7 +18,8 @@ def setup_logging(
             config = json.load(f)
         logging.config.dictConfig(config)
     else:
-        logging.basicConfig(level=default_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        # logging.basicConfig(level=default_level, format='%(name)s - %(levelname)s - %(message)s')
+        logging.basicConfig(level=default_level, format='%(levelname)s - %(message)s')
 
 def get_logger(name):
     """Get a logger with the specified name."""

@@ -12,7 +12,8 @@ class CurrentCommand:
         parser.set_defaults(command_class=CurrentCommand)
 
     def execute(self, args):
-        vendor, username = self.config.get_current_user(self.config.load)
+        config = self.config.load()
+        vendor, username = self.config.get_current_user(config)
         if vendor and username:
             logger.info(f"Current active user: {username} for vendor {vendor}")
         else:
