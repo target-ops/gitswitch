@@ -1,13 +1,22 @@
 import argparse
 import argcomplete
-from commands.add import AddCommand
-from commands.current import CurrentCommand
-from commands.delete import DeleteCommand
-from commands.generate_key import GenerateKeyCommand
-from commands.list import ListCommand
-from commands.switch import SwitchCommand
+from commands import add,current,delete,generate_key,list,switch
+# from commands.add import AddCommand
+# from commands.current import CurrentCommand
+# from commands.delete import DeleteCommand
+# from commands.generate_key import GenerateKeyCommand
+# from commands.list import ListCommand
+# from commands.switch import SwitchCommand
 
 class CLI:
+    addCmd=add.AddCommand()
+    currentCmd=current.CurrentCommand()
+    deleteCmd=delete.DeleteCommand()
+    generateKeyCmd=generate_key.GenerateKeyCommand()
+    listCmd=list.ListCommand()
+    switchCmd=switch.SwitchCommand()
+
+
     def __init__(self):
         self.parser = self.create_parser()
     
@@ -38,12 +47,12 @@ Examples:
         )
         subparsers = parser.add_subparsers(dest='command')
 
-        AddCommand.add_arguments(subparsers)
-        GenerateKeyCommand.add_arguments(subparsers)
-        ListCommand.add_arguments(subparsers)
-        SwitchCommand.add_arguments(subparsers)
-        DeleteCommand.add_arguments(subparsers)
-        CurrentCommand.add_arguments(subparsers)
+        self.addCmd.add_arguments(subparsers)
+        self.generateKeyCmd.add_arguments(subparsers)
+        self.listCmd.add_arguments(subparsers)
+        self.switchCmd.add_arguments(subparsers)
+        self.deleteCmd.add_arguments(subparsers)
+        self.currentCmd.add_arguments(subparsers)
 
         argcomplete.autocomplete(parser)
         return parser
