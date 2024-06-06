@@ -35,14 +35,37 @@ class GitConfig:
         for vendor in config.sections():
             if vendor == "current":
                 continue
-            print(f"{vendor}:")
             for username in config[vendor]:
-                email, key_path = config[vendor][username].split(',')
-                print(f"  Username: {username}, Email: {email}, SSH Key: {key_path}")
+                print(f"vendor: {vendor}, username: {username}")
 
     @staticmethod
     def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
-        """Upload SSH key to the vendor's platform."""
+        """Function upload_ssh_key_to_vendor."""
         public_key_path = f"{key_path}.pub"
         if not os.path.isfile(public_key_path):
-            raise FileNotFoundError(f"The public key file {public_key_path} should exist.")
+            raise FileNotFoundError(f"The public key file {public_key_path} does not exist.")
+
+        with open(public_key_path, 'r') as f:
+            public_key = f.read()
+
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "title": f"{username}'s key",
+            "key": public_key
+        }
+
+        if vendor == 'github':
+            response = requests.post("https://api.github.com/user/keys", headers=headers, json=data)
+        elif vendor == 'gitlab':
+            response = requests.post("https://gitlab.com/api/v4/user/keys", headers=headers, json=data)
+        else:
+            raise Exception(f"Unsupported vendor: {vendor}")
+
+        if response.status_code in [201, 200]:
+            print("Public key successfully uploaded.")
+        else:
+            print(f"Failed to upload public key: {response.status_code}")
+            print(response.json())
