@@ -1,5 +1,7 @@
 config.ini
 __pycache__/
+gitswitch.rb
+
 # Byte-compiled / optimized / DLL files
 *.py[cod]
 *$py.class
