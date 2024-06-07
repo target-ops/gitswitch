@@ -1,19 +1,23 @@
 import os
+import click
 import requests
-from .utils import run_command
-from .config import save_config
+from utils import run_command
+from config import save_config
 
 def set_global_git_user(username, email):
+    """Function set_global_git_user."""
     run_command(f'git config --global user.name "{username}"')
     run_command(f'git config --global user.email "{email}"')
 
 def add_user(config, vendor, username, email, key_path):
+    """Function add user."""
     if vendor not in config:
         config[vendor] = {}
     config[vendor][username] = f"{email},{key_path}"
     save_config(config)
 
 def delete_user(config, vendor, username):
+    """Function delete_user."""
     if vendor in config and username in config[vendor]:
         del config[vendor][username]
         if not config[vendor]:
@@ -26,12 +30,11 @@ def list_users(config):
     for vendor in config.sections():
         if vendor == "current":
             continue
-        print(f"{vendor}:")
         for username in config[vendor]:
             email, key_path = config[vendor][username].split(',')
-            print(f"  Username: {username}, Email: {email}, SSH Key: {key_path}")
+            click.echo(f"vendor: " + click.style(vendor, fg="green") + " username: " + click.style(username, fg="green"))
 
-def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
+def upload_ssh_key_to_vendor(vendor, username, key_path, token):
     public_key_path = f"{key_path}.pub"
     if not os.path.isfile(public_key_path):
         raise FileNotFoundError(f"The public key file {public_key_path} does not exist.")
@@ -56,7 +59,7 @@ def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
         raise Exception(f"Unsupported vendor: {vendor}")
 
     if response.status_code in [201, 200]:
-        print("Public key successfully uploaded.")
+        click.secho("Public key successfully uploaded.", fg='green')
     else:
-        print(f"Failed to upload public key: {response.status_code}")
-        print(response.json())
+        click.secho(f"Failed to upload public key: {response.status_code}", fg='red')
+        click.secho(response.json(), fg='red')

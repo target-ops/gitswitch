@@ -1,83 +1,111 @@
-import argparse
+import click
 import getpass
-from .config import load_config, set_current_user, get_current_user
-from .ssh import generate_ssh_key, update_ssh_config
-from .git import set_global_git_user, add_user, delete_user, list_users, upload_ssh_key_to_vendor
+from click_help_colors import HelpColorsGroup, HelpColorsCommand
+from src.config import load_config, set_current_user, get_current_user
+from src.ssh import generate_ssh_key, update_ssh_config
+from src.git import set_global_git_user, add_user, delete_user, list_users, upload_ssh_key_to_vendor
 
-def main():
-    parser = argparse.ArgumentParser(description='Manage multiple Git users for different vendors.')
-    subparsers = parser.add_subparsers(dest='command')
+version = "0.0.1"
 
-    # Add user command
-    parser_add = subparsers.add_parser('add', help='Add a new user')
-    parser_add.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
-    parser_add.add_argument('username', type=str, help='Git username')
-    parser_add.add_argument('email', type=str, help='User email')
-    parser_add.add_argument('key_path', type=str, help='Path to SSH key')
-    parser_add.add_argument('--upload-key', action='store_true', help='Upload the SSH key to the vendor')
+@click.version_option(version, "--version", "-V", message='%(version)s')
 
-    # Generate SSH key command
-    parser_generate = subparsers.add_parser('generate-key', help='Generate a new SSH key')
-    parser_generate.add_argument('email', type=str, help='Email for the SSH key')
-    parser_generate.add_argument('key_path', type=str, help='Path to store the SSH key')
+@click.group(
+    cls=HelpColorsGroup,
+    help_headers_color='white',
+    help_options_color='green',
+)
 
-    # List users command
-    parser_list = subparsers.add_parser('list', help='List all users')
+def cli():
+    """Manage multiple Git users for different vendors."""
+    pass
 
-    # Switch user command
-    parser_switch = subparsers.add_parser('switch', help='Switch to a different user')
-    parser_switch.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
-    parser_switch.add_argument('username', type=str, help='Git username')
+@cli.group()
+def add():
+    """Manage Git users."""
+    pass
 
-    # Delete user command
-    parser_delete = subparsers.add_parser('delete', help='Delete a user')
-    parser_delete.add_argument('vendor', type=str, help='Git vendor (e.g., github, gitlab)')
-    parser_delete.add_argument('username', type=str, help='Git username')
+@cli.group()
+def generate():
+    """Generate Key for different vendors."""
+    pass
 
-    # Current user command
-    parser_current = subparsers.add_parser('current', help='Show current active user')
 
-    args = parser.parse_args()
-
+@cli.command()
+def list():
+    """List all users."""
     config = load_config()
+    list_users(config)
+    # pass
 
-    if args.command == 'add':
-        add_user(config, args.vendor, args.username, args.email, args.key_path)
-        print(f"User {args.username} added for vendor {args.vendor}.")
-        if args.upload_key:
-            token = getpass.getpass(f"Enter your {args.vendor} personal access token: ")
-            upload_ssh_key_to_vendor(args.vendor, args.username, args.email, args.key_path, token)
+@add.command()
+@click.option('-v','--vendor',prompt='Vendor name', required=True, type=click.Choice(["github", "gitlab"]),help='Vendor name')
+@click.option('-u','--username',prompt='Username',required=True, help='Username of the user')
+@click.option('-e','--email',prompt='Email',required=True, help='Email address of the user')
+@click.option('-pk','--pub_key_path', prompt='Public Key Path',required=True ,help='Path to the public key file')
+def user(vendor, username, email, pub_key_path):
+    """Add a new user."""
+    config = load_config()
+    add_user(config, vendor, username, email, pub_key_path)
+    click.secho(f"User: {username} added for vendor {vendor}.", fg='green')
 
-    elif args.command == 'generate-key':
-        generate_ssh_key(args.email, args.key_path)
-        print(f"SSH key generated for {args.email}.")
+@add.command()
+@click.option('-v','--vendor',prompt='Vendor name', required=True, type=click.Choice(["github", "gitlab"]),help='Vendor name')
+@click.option('-u','--username',prompt='Username',required=True, help='Username of the user')
+@click.option('-pk','--pub_key_path', prompt='Public Key Path',required=True ,help='Path to the public key file')
+def uploadKey(vendor,username, pub_key_path):
+    """Upload the SSH key to the vendor.""" 
+    token = getpass.getpass(f"Enter your {vendor} personal access token: ")
+    upload_ssh_key_to_vendor(vendor, username, pub_key_path, token)
 
-    elif args.command == 'list':
-        list_users(config)
+@generate.command()
+@click.option('-e','--email',required=True, help='Email address of the user')
+@click.option('-pk','--pub_key_path', required=True ,help='Path to the public key file')
+def key(email, pub_key_path):
+    """Generate a new SSH key."""
+    generate_ssh_key(email, pub_key_path)
+    click.secho(f"SSH key generated for {email}.", fg='green')
 
-    elif args.command == 'switch':
-        if args.vendor in config and args.username in config[args.vendor]:
-            email, key_path = config[args.vendor][args.username].split(',')
-            set_global_git_user(args.username, email)
-            update_ssh_config(args.vendor, key_path)
-            set_current_user(config, args.vendor, args.username)
-            print(f"Switched to user {args.username} for vendor {args.vendor}.")
-        else:
-            print(f"User {args.username} not found for vendor {args.vendor}.")
+@cli.command()
+@click.option('-v','--vendor', prompt='Vendor name', type=click.Choice(["github", "gitlab"]), help='Vendor name')
+@click.option('-u','--username',prompt='Username',required=True, help='Username of the user')
+def switch(vendor, username):
+    """Switch to a different user."""
+    config = load_config()
+    if vendor in config and username in config[vendor]:
+        email, key_path = config[vendor][username].split(',')
+        set_global_git_user(username, email)
+        update_ssh_config(vendor, key_path)
+        set_current_user(config, vendor, username)
+        click.secho(f"Switched to: " + click.style(username, fg="green"))
+    else:
+        click.secho(f"User {username} not found for vendor {vendor}.", fg='red')
 
-    elif args.command == 'delete':
-        try:
-            delete_user(config, args.vendor, args.username)
-            print(f"User {args.username} deleted for vendor {args.vendor}.")
-        except Exception as e:
-            print(e)
+@cli.command()
+@click.option('-v','--vendor', prompt='Vendor name', required=True, type=click.Choice(["github", "gitlab"]),help='Vendor name')
+@click.option('-u','--username',prompt='Username', required=True, help='Username of the user')
+def delete(vendor, username):
+    """Delete user from config file."""
+    config = load_config()
+    try:
+        delete_user(config, vendor, username)
+        click.secho(f"User {username} deleted for vendor {vendor}.", fg='green')
+    except Exception as e:
+        click.secho(str(e), fg='red')
 
-    elif args.command == 'current':
-        vendor, username = get_current_user(config)
-        if vendor and username:
-            print(f"Current active user: {username} for vendor {vendor}")
-        else:
-            print("No active user set.")
+@cli.command()
+def current():
+    """Show current active user."""
+    config = load_config()
+    vendor, username = get_current_user(config)
+    if vendor and username:
+        click.secho(f"Active user: "+ click.style(username, fg="green")+ " for vendor: "+ click.style(vendor, fg="green"))
+    else:
+        click.secho("No active user set.", fg='yellow')
+
+
+# add.add_command(uploadKey)
+# add.add_command(current)
+generate.add_command(uploadKey)
 
 if __name__ == "__main__":
-    main()
+    cli()
