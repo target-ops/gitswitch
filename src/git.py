@@ -1,4 +1,5 @@
 import os
+import click
 import requests
 from utils import run_command
 from config import save_config
@@ -26,17 +27,14 @@ def delete_user(config, vendor, username):
         raise Exception(f"User {username} not found for vendor {vendor}")
 
 def list_users(config):
-    """Function list_users."""
     for vendor in config.sections():
         if vendor == "current":
             continue
-        print(f"{vendor}:")
         for username in config[vendor]:
             email, key_path = config[vendor][username].split(',')
-            print(f"  Username: {username}, Email: {email}, SSH Key: {key_path}")
+            click.echo(f"vendor: " + click.style(vendor, fg="green") + " username: " + click.style(username, fg="green"))
 
-def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
-    """Function upload_ssh_key_to_vendor."""
+def upload_ssh_key_to_vendor(vendor, username, key_path, token):
     public_key_path = f"{key_path}.pub"
     if not os.path.isfile(public_key_path):
         raise FileNotFoundError(f"The public key file {public_key_path} does not exist.")
@@ -61,7 +59,7 @@ def upload_ssh_key_to_vendor(vendor, username, email, key_path, token):
         raise Exception(f"Unsupported vendor: {vendor}")
 
     if response.status_code in [201, 200]:
-        print("Public key successfully uploaded.")
+        click.secho("Public key successfully uploaded.", fg='green')
     else:
-        print(f"Failed to upload public key: {response.status_code}")
-        print(response.json())
+        click.secho(f"Failed to upload public key: {response.status_code}", fg='red')
+        click.secho(response.json(), fg='red')

@@ -1,7 +1,7 @@
 import os
 import configparser
 
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), '..', 'config.ini')
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.ini')
 
 def load_config():
     """load_config if the file is not exists create."""
