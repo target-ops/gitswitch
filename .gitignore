@@ -1,5 +1,6 @@
 config.ini
 __pycache__/
+*.rb
 # Byte-compiled / optimized / DLL files
 *.py[cod]
 *$py.class
