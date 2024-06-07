@@ -3,39 +3,46 @@
 Welcome to **GitSwitch**, the ultimate solution for managing multiple Git users across different vendors like GitHub and GitLab. Whether you're a developer juggling multiple identities or a team lead needing to streamline SSH key management, Target-Ops has got you covered.
 
 ## 🌟 Features
-- **Add Users**: Easily add new Git users for various vendors.
-- **Switch Users**: Quickly switch between different Git user profiles.
-- **List Users**: View all configured Git users.
-- **Delete Users**: Remove Git users when they're no longer needed.
-- **Current User**: Display the currently active user.
-- **Generate SSH Keys**: Create and manage SSH keys seamlessly.
-- **Upload SSH Key**: Upload the SSH key.pub to your github/gitlab account
+- **User Management**: Add, switch, list, and delete Git users across various vendors with ease.
+- **SSH Key Management**: Generate and manage SSH keys seamlessly.
+- **SSH Key Upload**: Upload the SSH key.pub to your GitHub/GitLab account directly.
+- **Active User Display**: Easily view the currently active user.
 
 ## 📦 Installation
-Install the required dependencies:
+GitSwitch can be installed using Homebrew with the following commands:
+
+```sh
+brew tap target-ops/homebrew-tap 
+brew install target-ops/tap/gitswitch
 ```
-pip install -r requirements.txt
-```
+
 ## 🚀 Usage
 GitSwitch provides a command-line interface for managing Git users. Here are the available commands:
 #### Add User
-Add a new Git user for a specific vendor:
-```python main.py add <vendor> <username> <email> <key_path> --upload-key```
+```
+gitswitch add user --vendor <vendor> --username <username> --email <email> --pub_key_path <path_to_public_key>
+```
+
 #### Generate SSH Key
-Generate a new SSH key:
-```python main.py generate-key <email> <key_path>```
+```
+gitswitch generate key --email <email> --pub_key_path <path_to_public_key>
+```
 #### List Users
-List all configured Git users:
-```python main.py list```
+```
+gitswitch list
+```
 #### Switch User
-Switch to a different Git user:
-```python main.py switch <vendor> <username>```
+```
+gitswitch switch --vendor <vendor> --username <username>
+```
 #### Delete User
-Delete a configured Git user:
-``` python main.py delete <vendor> <username>```
+```
+gitswitch delete --vendor <vendor> --username <username>
+```
 #### Current User
-Display the currently active Git user:
-```python main.py current```
+```
+gitswitch current
+```
 
 ## ⚙️ Configuration
 Configuration is handled through a configuration file, typically located in your home directory. This file keeps track of all users and their associated details.
