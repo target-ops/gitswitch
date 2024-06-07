@@ -5,6 +5,10 @@ from src.config import load_config, set_current_user, get_current_user
 from src.ssh import generate_ssh_key, update_ssh_config
 from src.git import set_global_git_user, add_user, delete_user, list_users, upload_ssh_key_to_vendor
 
+version = "0.0.1"
+
+@click.version_option(version, "--version", "-V", message='%(version)s')
+
 @click.group(
     cls=HelpColorsGroup,
     help_headers_color='white',
