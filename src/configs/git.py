@@ -32,7 +32,7 @@ def list_users(config):
             continue
         for username in config[vendor]:
             email, key_path = config[vendor][username].split(',')
-            click.echo(f"vendor: " + click.style(vendor, fg="green") + " username: " + click.style(username, fg="green"))
+            click.echo("vendor: " + click.style(vendor, fg="yellow") + " username: " + click.style(username, fg="yellow"))
 
 def upload_ssh_key_to_vendor(vendor, username, key_path, token):
     public_key_path = f"{key_path}.pub"

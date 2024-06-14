@@ -7,7 +7,7 @@ from configs.git import add_user, upload_ssh_key_to_vendor
 
 @click.group(cls=HelpColorsGroup,help_headers_color='white',help_options_color='green')
 def add():
-    """Commands to manage Git users and their SSH keys.
+    """Commands to manage Git users and their SSH keys.                                 
     Use these commands to add new Git user profiles, configure user details,
     and upload SSH keys to GitHub or GitLab for secure authentication.
     """

@@ -14,6 +14,6 @@ def current():
     config = load_config()
     vendor, username = get_current_user(config)
     if vendor and username:
-        click.secho(f"Active user: "+ click.style(username, fg="green")+ " for vendor: "+ click.style(vendor, fg="green"))
+        click.secho("Active user: " + click.style(username, fg="yellow") + " for vendor: " + click.style(vendor, fg="yellow"))
     else:
         click.secho("No active user set.", fg='yellow')
