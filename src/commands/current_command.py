@@ -6,7 +6,8 @@ def current():
     """Show the current active Git user.
 
     This command displays the currently active Git user profile, including the vendor (GitHub or GitLab)
-    and the username. If no user is set as active, it informs you accordingly.
+    and the username.                                                                                   
+    If no user is set as active, it informs you accordingly.
 
     Example usage:\n
     - gitswitch current

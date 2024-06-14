@@ -20,8 +20,8 @@ def key(email, pub_key_path):
     """Generate a new SSH key.
 
     This command creates a new SSH key pair using the provided email address and 
-    saves the public key to the specified file path. The SSH key is essential for 
-    secure communication with Git repositories on platforms like GitHub and GitLab.
+    saves the public key to the specified file path.                                        
+    The SSH key is essential for secure communication with Git repositories on platforms like GitHub and GitLab.
 
     Example usage:\n
     - gitswitch generate key -e email@example.com -pk /path/pubkey
