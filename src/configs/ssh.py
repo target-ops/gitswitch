@@ -1,5 +1,5 @@
 import os
-from utils import run_command
+from configs.utils import run_command
 
 SSH_CONFIG_FILE = os.path.expanduser('~/.ssh/config')
 
