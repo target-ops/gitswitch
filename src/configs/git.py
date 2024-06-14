@@ -1,8 +1,8 @@
 import os
 import click
 import requests
-from utils import run_command
-from config import save_config
+from configs.utils import run_command
+from configs.config import save_config
 
 def set_global_git_user(username, email):
     """Function set_global_git_user."""
