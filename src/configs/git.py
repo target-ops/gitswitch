@@ -27,6 +27,7 @@ def delete_user(config, vendor, username):
         raise Exception(f"User {username} not found for vendor {vendor}")
 
 def list_users(config):
+    """Function list users."""
     for vendor in config.sections():
         if vendor == "current":
             continue
@@ -35,6 +36,7 @@ def list_users(config):
             click.echo("vendor: " + click.style(vendor, fg="yellow") + " username: " + click.style(username, fg="yellow"))
 
 def upload_ssh_key_to_vendor(vendor, username, key_path, token):
+    """Function upload ssh key to vendor."""
     public_key_path = f"{key_path}.pub"
     if not os.path.isfile(public_key_path):
         raise FileNotFoundError(f"The public key file {public_key_path} does not exist.")

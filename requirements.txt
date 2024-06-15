@@ -1,3 +1,4 @@
 requests
 click
 click_help_colors
+inquirer
