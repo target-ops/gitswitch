@@ -15,18 +15,21 @@ def generate():
 
 @click.command(cls=HelpColorsCommand,help_options_color='green')
 @click.option('-e','--email',required=True, help='Email address of the user')
-@click.option('-pk','--pub_key_path', required=True ,help='Path to the public key file')
-def key(email, pub_key_path):
+def key(email):
     """Generate a new SSH key.
 
-    This command creates a new SSH key pair using the provided email address and 
-    saves the public key to the specified file path.                                        
+    This command creates a new SSH key pair using the provided email address. 
     The SSH key is essential for secure communication with Git repositories on platforms like GitHub and GitLab.
 
+    The key pair is saved in the ~/.ssh directory.                                                              
+    The private key file is named id_rsa_{username}, where {username} is the part of the email before the '@' symbol.
+
     Example usage:\n
-    - gitswitch generate key -e email@example.com -pk /path/pubkey
+    - gitswitch generate key -e email@example.com
+
+    
     """
-    generate_ssh_key(email, pub_key_path)
+    generate_ssh_key(email)
     click.secho(f"SSH key generated for {email}.", fg='green')
 
 generate.add_command(key)
