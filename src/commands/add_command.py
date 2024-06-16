@@ -53,9 +53,7 @@ def user(vendor, username, email, generate):
     - gitswitch add user -v github -u username -e email@example.com
     """
     config = load_config()
-    print(generate)
     if generate:
-        print("inside generate")
         generate_ssh_key(email)
     add_user(config, vendor, username, email)
     click.secho(f"User: {username} added for vendor {vendor}.", fg='green')
