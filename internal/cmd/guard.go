@@ -12,6 +12,7 @@ import (
 	"github.com/target-ops/gitswitch/internal/git"
 	"github.com/target-ops/gitswitch/internal/hookscript"
 	"github.com/target-ops/gitswitch/internal/identity"
+	"github.com/target-ops/gitswitch/internal/style"
 )
 
 // HooksDir is the directory we install our hook into. We use our own
@@ -139,10 +140,15 @@ func runGuardInstall(force bool) error {
 		)
 	}
 
-	fmt.Printf("%s%s✓ guard installed%s\n", green, bold, reset)
-	fmt.Println()
-	fmt.Printf("  %shook:%s         %s\n", dim, reset, hookPath)
-	fmt.Printf("  %score.hooksPath:%s %s\n", dim, reset, hooksDir)
+	body := fmt.Sprintf(
+		"%s%s✓ guard installed%s\n\n"+
+			"  %shook:%s           %s\n"+
+			"  %score.hooksPath:%s %s",
+		green, bold, reset,
+		dim, reset, hookPath,
+		dim, reset, hooksDir,
+	)
+	fmt.Println(style.Box(body, style.BoxSuccess))
 	fmt.Println()
 	fmt.Println(dim + "Every `git commit` now checks identity vs directory binding." + reset)
 	fmt.Println(dim + "Override once: " + reset + "git commit --no-verify")
@@ -235,18 +241,21 @@ func runGuardCheck(_ []string) error {
 	}
 
 	// Mismatch. This is the disaster-prevention moment.
+	body := fmt.Sprintf(
+		"%s%s✗ gitswitch guard: blocked commit%s\n\n"+
+			"  %sin directory:%s   %s\n"+
+			"  %sexpected:%s       %s   (bound identity: %s)\n"+
+			"  %sgot:%s            %s\n\n"+
+			"  %sfix:%s            gitswitch use %s %s\n"+
+			"                  (or: git commit --no-verify to override this once)",
+		red, bold, reset,
+		dim, reset, cwd,
+		dim, reset, id.Email, id.Name,
+		dim, reset, effective,
+		dim, reset, id.Name, binding.Directory,
+	)
 	fmt.Fprintln(os.Stderr)
-	fmt.Fprintf(os.Stderr, "%s%s✗ gitswitch guard: blocked commit%s\n",
-		red, bold, reset)
-	fmt.Fprintln(os.Stderr)
-	fmt.Fprintf(os.Stderr, "  %sin directory:%s   %s\n", dim, reset, cwd)
-	fmt.Fprintf(os.Stderr, "  %sexpected:%s       %s   (bound identity: %s)\n",
-		dim, reset, id.Email, id.Name)
-	fmt.Fprintf(os.Stderr, "  %sgot:%s            %s\n", dim, reset, effective)
-	fmt.Fprintln(os.Stderr)
-	fmt.Fprintf(os.Stderr, "  %sfix:%s            gitswitch use %s %s\n",
-		dim, reset, id.Name, binding.Directory)
-	fmt.Fprintf(os.Stderr, "                  (or: git commit --no-verify to override this once)\n")
+	fmt.Fprintln(os.Stderr, style.Box(body, style.BoxError))
 	fmt.Fprintln(os.Stderr)
 	os.Exit(1)
 	return nil

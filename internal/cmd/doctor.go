@@ -12,16 +12,6 @@ import (
 	"github.com/target-ops/gitswitch/internal/ssh"
 )
 
-// ANSI for terminals — we'll swap in a real color lib in a later PR.
-const (
-	green  = "\033[32m"
-	yellow = "\033[33m"
-	red    = "\033[31m"
-	dim    = "\033[2m"
-	bold   = "\033[1m"
-	reset  = "\033[0m"
-)
-
 func newDoctorCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "doctor",
