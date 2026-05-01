@@ -11,20 +11,9 @@
 
 </div>
 
----
-
-```text
-$ git commit -m "fix the auth flow"
-
-✗ gitswitch guard: blocked commit
-
-  in directory:   ~/work/some-repo/
-  expected:       you@company.com   (bound identity: work)
-  got:            you@gmail.com
-
-  fix:            gitswitch use work
-                  (or: git commit --no-verify to override this once)
-```
+<p align="center">
+  <img src="docs/demo.gif" alt="gitswitch guard blocking a wrong-author commit, then succeeding after fix" width="900">
+</p>
 
 ## The problem
 
