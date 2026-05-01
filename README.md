@@ -26,10 +26,6 @@ $ git commit -m "fix the auth flow"
                   (or: git commit --no-verify to override this once)
 ```
 
-Above is what `gitswitch` does. Below is why.
-
----
-
 ## The problem
 
 You set your `git user.email` to your work address last Tuesday. Forgot to switch back. For the next three weeks every commit to your personal side project went out under your employer's email. You found out by accident, looking at your contribution graph.
