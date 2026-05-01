@@ -1,0 +1,85 @@
+# Cross-compile + release config for gitswitch.
+#
+# Local sanity check:
+#   goreleaser release --snapshot --clean --skip=publish
+# Tag-driven publish (run by GitHub Actions on tag push):
+#   goreleaser release --clean
+version: 2
+project_name: gitswitch
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: gitswitch
+    main: ./cmd/gitswitch
+    binary: gitswitch
+    env:
+      # Static binary so the formula stays "drop one file into bin/".
+      # CGO_ENABLED=0 means no libc linkage, no "wrong glibc" surprises
+      # on Linux, and no Cellar/Frameworks fallout on macOS.
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      # Apple shipped Windows-on-ARM laptops exist but the audience for
+      # gitswitch on them is microscopic. Drop in to keep CI fast; can
+      # be re-enabled later if anyone asks.
+      - goos: windows
+        goarch: arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+
+archives:
+  - id: gitswitch
+    formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+      - 'Merge pull request'
+      - 'Merge branch'
+
+release:
+  github:
+    owner: target-ops
+    name: gitswitch
+  draft: false
+  prerelease: auto
+  header: |
+    Install via brew (after the formula PR lands):
+
+    ```
+    brew install target-ops/tap/gitswitch
+    ```
+
+    Or grab a binary from the assets below.
