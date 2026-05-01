@@ -54,6 +54,6 @@ def user(vendor, username, email, generate):
     """
     config = load_config()
     if generate:
-        generate_ssh_key(email)
+        generate_ssh_key(email, vendor=vendor, username=username)
     add_user(config, vendor, username, email)
     click.secho(f"User: {username} added for vendor {vendor}.", fg='green')

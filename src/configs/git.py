@@ -4,6 +4,7 @@ import requests
 import re
 from configs.utils import run_command
 from configs.config import save_config
+from configs.ssh import default_key_path
 
 def set_global_git_user(username, email):
     """Function set_global_git_user."""
@@ -12,16 +13,20 @@ def set_global_git_user(username, email):
 
 def add_user(config, vendor, username, email):
     """Function add user."""
-    username = email.split('@')[0]
-    ssh_dir = os.path.expanduser('~/.ssh')
-    key_path = os.path.join(ssh_dir, f'id_rsa_{username}')
-
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
         click.secho(f'Invalid email: {email}, expect: example@gmail.com.', fg='red')
         exit(0)
 
+    if not username:
+        username = email.split('@')[0]
+
+    key_path = default_key_path(vendor, username)
     if not os.path.exists(key_path):
-        click.secho(f'SSH key does not exist at: {key_path}, please generate one first by running:\ngitswitch generate key -e example@gmail.com', fg='red')
+        click.secho(
+            f'SSH key does not exist at: {key_path}, please generate one first by running:\n'
+            f'gitswitch generate key -v {vendor} -u {username} -e {email}',
+            fg='red',
+        )
         exit(0)
 
     if vendor not in config:
@@ -67,9 +72,9 @@ def upload_ssh_key_to_vendor(vendor, username, key_path, token):
     }
 
     if vendor == 'github':
-        response = requests.post("https://api.github.com/user/keys", headers=headers, json=data)
+        response = requests.post("https://api.github.com/user/keys", headers=headers, json=data, timeout=10)
     elif vendor == 'gitlab':
-        response = requests.post("https://gitlab.com/api/v4/user/keys", headers=headers, json=data)
+        response = requests.post("https://gitlab.com/api/v4/user/keys", headers=headers, json=data, timeout=10)
     else:
         raise Exception(f"Unsupported vendor: {vendor}")
 

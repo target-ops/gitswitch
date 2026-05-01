@@ -21,6 +21,8 @@ Welcome to **GitSwitch**, the ultimate solution for managing multiple Git users 
 - **SSH Key Management**: Generate and manage SSH keys seamlessly.
 - **SSH Key Upload**: Upload the SSH key.pub to your GitHub/GitLab account directly.
 - **Active User Display**: Easily view the currently active user.
+- **GitHub CLI Sync**: When switching to a GitHub identity, `gh auth switch` runs automatically so `gh pr create`, `gh repo clone`, etc. use the right account.
+- **Non-destructive SSH config**: Updates only the `Host github.com` / `Host gitlab.com` block in `~/.ssh/config`; all your other entries are preserved.
 
 ## 📦 Installation
 GitSwitch can be installed using Homebrew with the following commands:
@@ -34,12 +36,12 @@ brew install target-ops/tap/gitswitch
 GitSwitch provides a command-line interface for managing Git users. Here are the available commands:
 #### Add User
 ```
-gitswitch add user --vendor <vendor> --username <username> --email <email> --pub_key_path <path_to_public_key>
+gitswitch add user --vendor <vendor> --username <username> --email <email> [--generate]
 ```
 
 #### Generate SSH Key
 ```
-gitswitch generate key --email <email> --pub_key_path <path_to_public_key>
+gitswitch generate key --email <email> [--vendor <vendor> --username <username>]
 ```
 #### List Users
 ```
