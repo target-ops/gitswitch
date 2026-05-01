@@ -106,7 +106,7 @@ func Scan() []Detected {
 // same vendor. In that case the weak fragment is almost certainly
 // describing the same person.
 //
-// Concretely: gh login OfirHaim1 (vendor=github, no email/key) gets
+// Concretely: gh login octocat (vendor=github, no email/key) gets
 // distributed onto a single id_rsa-bearing identity that also targets
 // github.com. If two strong github identities exist, we leave the weak
 // fragment standalone — better to ask the user than guess wrong.
@@ -213,7 +213,7 @@ func matchSSHKey(a *Detected, b Detected) bool {
 	if a.SSHKey == b.SSHKey {
 		return true
 	}
-	// Symlink resolution: id_rsa_github_OfirHaim1 might be a symlink to
+	// Symlink resolution: id_rsa_github_work might be a symlink to
 	// id_rsa, and we want those to coalesce.
 	ar, errA := filepath.EvalSymlinks(a.SSHKey)
 	br, errB := filepath.EvalSymlinks(b.SSHKey)

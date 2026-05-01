@@ -6,7 +6,7 @@
 
 It was a Saturday, around 11pm, and I was idly looking at my GitHub contribution graph for no particular reason. I noticed something was off. The green squares for the past three weeks were on my personal account, but I'd been doing client work that whole time. I clicked one of the squares.
 
-It was a commit on the client's repo. Authored by `ofir474@gmail.com`. My personal email. On the company project.
+It was a commit on the client's repo. Authored by my personal email. On the company project.
 
 I scrolled. There were forty-seven of them.
 

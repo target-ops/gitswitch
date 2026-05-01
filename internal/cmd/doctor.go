@@ -125,13 +125,13 @@ func looksLikeGitHost(hostname, alias string) bool {
 	return false
 }
 
-// parseLoginFromGreeting extracts "OfirHaim1" from "Hi OfirHaim1! You've ..."
+// parseLoginFromGreeting extracts "octocat" from "Hi octocat! You've ..."
 func parseLoginFromGreeting(g string) string {
 	g = strings.TrimSpace(g)
 	for _, prefix := range []string{"Hi ", "Welcome ", "Hello "} {
 		if strings.HasPrefix(g, prefix) {
 			rest := strings.TrimPrefix(g, prefix)
-			// "OfirHaim1!" → "OfirHaim1"
+			// "octocat!" → "octocat"
 			if idx := strings.IndexAny(rest, "!,. "); idx > 0 {
 				return rest[:idx]
 			}
