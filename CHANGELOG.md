@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.2](https://github.com/target-ops/gitswitch/compare/v1.0.1...v1.0.2) (2026-05-01)
+
+
+### Bug Fixes
+
+* **ci:** add release.published + workflow_dispatch triggers to release.yml ([80cb6ad](https://github.com/target-ops/gitswitch/commit/80cb6adb93db403955269f5fb9aba411a52071bd))
+* **ci:** add release.published + workflow_dispatch triggers to release.yml ([8fa169a](https://github.com/target-ops/gitswitch/commit/8fa169a680eb19a82d84926faf7dc9a09363f82f))
+* use truecolor palette so output reads as punchy, not muted grey ([e18eadd](https://github.com/target-ops/gitswitch/commit/e18eadd3286d647deab3e4c6edde67f1acca12c9))
+* use truecolor palette so output reads punchy, not muted grey ([4c1bb58](https://github.com/target-ops/gitswitch/commit/4c1bb584348dcbf69c23f446b844f43de2d63565))
+
 ## [1.0.1](https://github.com/target-ops/gitswitch/compare/v1.0.0...v1.0.1) (2026-05-01)
 
 
