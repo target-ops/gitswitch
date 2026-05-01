@@ -27,7 +27,13 @@ func newRenameCommand() *cobra.Command {
 Useful when init auto-named an identity something awkward (e.g. a
 lowercased gh login) and you want a more human name. Underlying
 SSH keys and gh accounts are untouched.`,
-		Args: cobra.ExactArgs(2),
+		Args: exactArgsHelp(2,
+			"gitswitch rename takes <old-name> <new-name>",
+			"gitswitch rename ofirhaim1 personal",
+			"gitswitch mv work-old work    # alias",
+		),
+		Example: "  gitswitch rename ofirhaim1 personal\n" +
+			"  gitswitch mv work-old work-new",
 		RunE: func(_ *cobra.Command, args []string) error {
 			return runRename(args[0], args[1])
 		},

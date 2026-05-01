@@ -24,6 +24,8 @@ one. Writes the gitswitch config — but does not yet apply anything to
 
 This command is read-only with respect to the rest of your system. The
 only file it writes is ~/.config/gitswitch/config.json.`,
+		Example: "  gitswitch init           # interactive — prompts to name each identity\n" +
+			"  gitswitch init -y        # accept proposed names, no prompts",
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return runInit(assumeYes)
 		},

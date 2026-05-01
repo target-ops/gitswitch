@@ -28,7 +28,13 @@ Required: <name> + --email. Everything else is optional.
 
 Run with no flags (just the name) and you'll get an interactive
 prompt for each field.`,
-		Args: cobra.ExactArgs(1),
+		Args: exactArgsHelp(1,
+			"gitswitch add requires an identity name",
+			"gitswitch add work --email you@company.com",
+			"gitswitch add personal              (interactive prompts for the rest)",
+		),
+		Example: "  gitswitch add work --email you@company.com --gh you-work\n" +
+			"  gitswitch add personal     # interactive: prompts for email, key, gh, etc.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runAdd(cmd, args[0])
 		},

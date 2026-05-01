@@ -36,7 +36,15 @@ Concretely, "use" does three things:
 Re-running "use" with the same identity + directory is a no-op (the
 sentinel-marked block is replaced in place). Run with --unbind to
 remove the binding.`,
-		Args: cobra.RangeArgs(1, 2),
+		Args: rangeArgsHelp(1, 2,
+			"gitswitch use takes <identity> [<directory>]",
+			"gitswitch use work ~/work      # bind work identity to ~/work",
+			"gitswitch use personal ~/code",
+			"gitswitch use work             # refresh per-identity config (no binding)",
+		),
+		Example: "  gitswitch use work ~/work\n" +
+			"  gitswitch use personal ~/code\n" +
+			"  gitswitch use work ~/work --unbind   # reverse the binding",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			unbind, _ := cmd.Flags().GetBool("unbind")
 			return runUse(args, unbind)

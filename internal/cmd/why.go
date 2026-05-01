@@ -21,6 +21,8 @@ included, what user.email resolves to, and whether the layers agree.
 
 The honest counterweight to any "automatic" tool — magic you can't
 inspect is just a bug waiting to happen.`,
+		Example: "  cd ~/work && gitswitch why\n" +
+			"  cd ~/personal && gitswitch why",
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return runWhy()
 		},

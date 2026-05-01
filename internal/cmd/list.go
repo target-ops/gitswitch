@@ -19,6 +19,8 @@ binding currently active. Reads ~/.config/gitswitch/config.json.
 
 This is what you should run before "gitswitch use" if you've
 forgotten the names of your identities.`,
+		Example: "  gitswitch list\n" +
+			"  gitswitch ls",
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return runList()
 		},
