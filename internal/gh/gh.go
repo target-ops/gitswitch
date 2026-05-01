@@ -20,7 +20,7 @@ func IsInstalled() bool {
 	return err == nil
 }
 
-// ActiveLogin returns the currently active gh user's login (e.g. "OfirHaim1")
+// ActiveLogin returns the currently active gh user's login (e.g. "octocat")
 // by calling `gh api user --jq .login`. Empty string + nil error when not
 // logged in or `gh` is missing.
 func ActiveLogin() (string, error) {

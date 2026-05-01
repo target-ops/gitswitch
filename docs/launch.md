@@ -47,8 +47,8 @@ The commit fires. Output appears in red, slightly larger than ambient text:
 ✗ gitswitch guard: blocked commit
 
   in directory:   ~/work/some-repo/
-  expected:       ofir@company.com   (bound identity: work)
-  got:            ofir474@gmail.com
+  expected:       you@company.com   (bound identity: work)
+  got:            you@gmail.com
 
   fix:            gitswitch use work
                   (or: git commit --no-verify to override this once)
@@ -122,8 +122,8 @@ Error: identity mismatch.
 Good:
 ```
 ✗ gitswitch guard: blocked commit
-  expected:  ofir@company.com  (bound identity: work)
-  got:       ofir474@gmail.com
+  expected:  you@company.com  (bound identity: work)
+  got:       you@gmail.com
   fix:       gitswitch use work
 ```
 
