@@ -1,62 +1,90 @@
 name: release
 
-# Three triggers, all converge on the same GoReleaser run:
+# One workflow, the whole release pipeline:
 #
-# 1. push.tags — manual `git push origin vX.Y.Z` from a maintainer's
-#    machine. Useful for quick out-of-band releases.
+#   push to main  ──►  release-please job  ──►  opens / updates a
+#                                              "chore(main): release vX.Y.Z" PR
+#                                              with the changelog
 #
-# 2. release.published — fires when GitHub creates a release. This is
-#    what release-please does at the end of its workflow. The
-#    `push.tags` trigger does NOT fire for tags created via the
-#    GITHUB_TOKEN (anti-loop safeguard), so this is the path that
-#    keeps the auto-release pipeline healthy.
+#   merge that PR ──►  release-please job  ──►  creates the GitHub Release
+#                                              + tag, sets release_created=true
+#                                                       │
+#                                                       ▼
+#                      goreleaser job      ──►  builds 5 platform binaries
+#                                              uploads them to the release
+#                                              auto-pushes the formula to
+#                                              target-ops/homebrew-tap
 #
-# 3. workflow_dispatch — manual recovery. If a release got cut but
-#    the GoReleaser run never fired (or failed mid-way), an admin
-#    can re-run for a specific tag from the Actions UI without
-#    re-tagging.
+#   workflow_dispatch ──►  goreleaser job  ──►  manual recovery for an
+#   (with tag input)                            existing tag — release-please
+#                                              is skipped
+#
+# Why two jobs in one file (instead of two workflows): the brew formula
+# update is part of "release", not a separate concern. Splitting the
+# pipeline into release-please.yml + release.yml previously bit us
+# because tags created by release-please via the default GITHUB_TOKEN
+# don't fire `push: tags` (anti-loop safeguard) — we needed an
+# inter-workflow `release: published` bridge to glue them. Folding
+# both jobs into one file deletes the bridge and the gotcha.
 on:
   push:
-    tags:
-      - 'v*'
-  release:
-    types: [published]
+    branches: [main]
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to build (e.g. v1.0.1). Defaults to the workflow run ref.'
+        description: 'Tag to (re)build, e.g. v1.0.1. Leave empty for the normal release-please flow.'
         required: false
 
 permissions:
-  # Required so goreleaser can create / update the GitHub Release and
-  # upload assets. No write to anything else (the cross-repo brew push
-  # uses HOMEBREW_TAP_TOKEN, not GITHUB_TOKEN).
+  # release-please needs to open/update PRs and create releases.
   contents: write
+  pull-requests: write
 
 jobs:
+  release-please:
+    # Skip on manual recovery — the maintainer is targeting a specific
+    # tag, not driving the version-bump flow.
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+      tag_name:        ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file:   .github/release-please-config.json
+          manifest-file: .github/release-please-manifest.json
+
   goreleaser:
+    needs: [release-please]
+    # Run when EITHER:
+    #   - release-please just cut a release on the merge of a release PR
+    #   - someone manually dispatched with a tag for recovery
+    # `always()` is required so this job isn't skipped just because
+    # release-please was skipped (workflow_dispatch path).
+    if: |
+      always() && (
+        (github.event_name == 'push' && needs.release-please.outputs.release_created == 'true') ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.tag != '')
+      )
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          # On workflow_dispatch with a tag input, check out that tag.
-          # Otherwise fall through to the workflow's natural ref
-          # (the tag for push/release events, default branch for
-          # bare manual dispatch).
-          ref: ${{ github.event.inputs.tag || github.ref }}
-          # GoReleaser needs the full history to compute the changelog
+          # On manual dispatch: check out the supplied tag.
+          # On the release-please path: check out the tag release-please created.
+          ref: ${{ github.event.inputs.tag || needs.release-please.outputs.tag_name }}
+          # GoReleaser needs full history to compute the changelog
           # since the previous tag.
           fetch-depth: 0
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
           go-version: stable
           cache: true
 
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+      - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: '~> v2'
@@ -64,6 +92,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Cross-repo PAT used by the `brews:` block in .goreleaser.yml
-          # to push the updated formula to target-ops/homebrew-tap.
-          # Set this secret on the gitswitch repo before tagging.
+          # to push the updated formula to target-ops/homebrew-tap on
+          # every release. Set on the gitswitch repo's secrets.
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
