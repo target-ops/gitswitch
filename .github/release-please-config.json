@@ -6,7 +6,6 @@
   "packages": {
     ".": {
       "package-name": "gitswitch",
-      "release-as": "1.0.1",
       "changelog-sections": [
         { "type": "feat",     "section": "Features"        },
         { "type": "fix",      "section": "Bug Fixes"       },
