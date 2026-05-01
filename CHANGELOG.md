@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/target-ops/gitswitch/compare/v1.0.2...v1.1.0) (2026-05-01)
+
+
+### Features
+
+* identity lifecycle commands — list, add, delete, rename ([5fba051](https://github.com/target-ops/gitswitch/commit/5fba051c2cbd61c065d061fc9186bfeb7fbeba7c))
+* identity lifecycle commands — list, add, delete, rename ([c0893cc](https://github.com/target-ops/gitswitch/commit/c0893cc50735d40c598ba43e06f9a3cb94a0b5f2))
+
 ## [1.0.2](https://github.com/target-ops/gitswitch/compare/v1.0.1...v1.0.2) (2026-05-01)
 
 
