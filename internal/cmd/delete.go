@@ -28,7 +28,14 @@ Does NOT touch your SSH keys, GPG keys, or gh CLI authentication —
 those aren't gitswitch's to delete. Use this when you've added a
 duplicate by accident or want to retire an identity from gitswitch
 without nuking the underlying credentials.`,
-		Args: cobra.ExactArgs(1),
+		Args: exactArgsHelp(1,
+			"gitswitch delete requires an identity name",
+			"gitswitch delete work        (prompts before removing)",
+			"gitswitch delete work -y     (skips the confirmation)",
+		),
+		Example: "  gitswitch delete work\n" +
+			"  gitswitch rm personal -y\n" +
+			"  gitswitch list             # see what's configured first",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			yes, _ := cmd.Flags().GetBool("yes")
 			return runDelete(args[0], yes)

@@ -22,7 +22,8 @@ green line if everything agrees, or a red diff if they disagree.
 
 This is the command you should run any time you suspect "wait, did
 my last commit go out as the right person?"`,
-		RunE: runDoctor,
+		Example: "  gitswitch doctor",
+		RunE:    runDoctor,
 	}
 }
 
