@@ -10,6 +10,7 @@ import (
 
 	"github.com/target-ops/gitswitch/internal/discover"
 	"github.com/target-ops/gitswitch/internal/identity"
+	"github.com/target-ops/gitswitch/internal/legacy"
 )
 
 func newInitCommand() *cobra.Command {
@@ -33,6 +34,15 @@ only file it writes is ~/.config/gitswitch/config.json.`,
 }
 
 func runInit(assumeYes bool) error {
+	// 0. surface legacy v0.2.x config if present — many users coming
+	//    from brew will have one and miss it otherwise.
+	if legacy.Exists() {
+		fmt.Println(yellow + "Found a v0.2.x config at " + legacy.LegacyPath() + reset)
+		fmt.Println(dim + "  to import it instead of (or in addition to) auto-detection:" + reset)
+		fmt.Println(dim + "    gitswitch migrate" + reset)
+		fmt.Println()
+	}
+
 	// 1. discover
 	found := discover.Scan()
 	if len(found) == 0 {
