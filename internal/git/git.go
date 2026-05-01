@@ -15,6 +15,14 @@ func GlobalIdentity() (name, email string, err error) {
 	return name, email, nil
 }
 
+// GlobalSigning returns the global signing key path and signing format
+// (e.g. "ssh", "openpgp"). Either string may be empty if unset.
+func GlobalSigning() (signingKey, format string) {
+	signingKey, _ = configGet("--global", "user.signingkey")
+	format, _ = configGet("--global", "gpg.format")
+	return signingKey, format
+}
+
 // configGet runs `git config <args...>` and returns the trimmed stdout.
 // Returns an empty string and a wrapped error when git exits non-zero
 // (e.g., the key isn't set).
