@@ -24,5 +24,6 @@ work to a company repo.`,
 	root.AddCommand(newInitCommand())
 	root.AddCommand(newUseCommand())
 	root.AddCommand(newGuardCommand())
+	root.AddCommand(newWhyCommand())
 	return root
 }
