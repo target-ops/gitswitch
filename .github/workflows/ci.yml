@@ -1,0 +1,34 @@
+name: ci
+
+# Catch breakage before it hits main, and verify main itself stays
+# green so release-please's "merge me to release" PR is always
+# trustworthy.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: true
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go build
+        run: go build -o /tmp/gitswitch ./cmd/gitswitch
+
+      - name: go test
+        # No suite yet, but this keeps CI honest the moment we add one.
+        # `go test ./...` exits 0 when there are no tests.
+        run: go test ./...

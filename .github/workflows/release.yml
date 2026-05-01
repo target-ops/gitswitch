@@ -37,3 +37,7 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Cross-repo PAT used by the `brews:` block in .goreleaser.yml
+          # to push the updated formula to target-ops/homebrew-tap.
+          # Set this secret on the gitswitch repo before tagging.
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}

@@ -76,10 +76,44 @@ release:
   draft: false
   prerelease: auto
   header: |
-    Install via brew (after the formula PR lands):
+    Install via brew:
 
     ```
-    brew install target-ops/tap/gitswitch
+    brew update
+    brew install target-ops/tap/gitswitch   # or: brew upgrade gitswitch
     ```
 
     Or grab a binary from the assets below.
+
+# Auto-publish the homebrew formula to target-ops/homebrew-tap on
+# every release. GoReleaser computes the per-platform sha256s,
+# generates the Formula/gitswitch.rb with on_macos/on_linux blocks,
+# and pushes a commit to the tap repo. Requires HOMEBREW_TAP_TOKEN
+# in the gitswitch repo's secrets — a PAT with write access to the
+# homebrew-tap repo's contents (the default GITHUB_TOKEN can't reach
+# across repositories).
+brews:
+  - repository:
+      owner: target-ops
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/target-ops/gitswitch"
+    description: "Stop committing as the wrong person — directory-bound git identities"
+    license: "MIT"
+    # Skip publishing to the tap on prereleases (release candidates,
+    # beta tags, etc.). Stable users on `brew install` should never
+    # accidentally pick up a -rc build.
+    skip_upload: auto
+    install: |
+      bin.install "gitswitch"
+    test: |
+      assert_match version.to_s, shell_output("#{bin}/gitswitch --version")
+      help = shell_output("#{bin}/gitswitch --help")
+      %w[init use guard doctor why].each do |cmd|
+        assert_match cmd, help
+      end
+    commit_author:
+      name: gitswitch-release-bot
+      email: noreply@github.com
+    commit_msg_template: "gitswitch: bump to {{ .Tag }}"
