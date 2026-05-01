@@ -11,6 +11,12 @@ func NewRootCommand(version string) *cobra.Command {
 	root := &cobra.Command{
 		Use:   "gitswitch",
 		Short: "Stop committing as the wrong person.",
+		// Cobra auto-generates a `completion` subcommand that emits
+		// shell completion scripts. Useful, but in `gitswitch --help`
+		// it adds noise next to our five real commands. Hide it from
+		// the listing — power users still find it via
+		// `gitswitch completion --help`.
+		CompletionOptions: cobra.CompletionOptions{HiddenDefaultCmd: true},
 		Long: `gitswitch — manage multiple Git identities (SSH, gh CLI, signing) ` +
 			`per directory.
 
