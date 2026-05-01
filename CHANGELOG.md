@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/target-ops/gitswitch/compare/v1.1.0...v1.1.1) (2026-05-01)
+
+
+### Bug Fixes
+
+* helpful error messages when arguments are missing ([1373c84](https://github.com/target-ops/gitswitch/commit/1373c849aabdcf62572f7ee87c8bb0d92b9cf3f5))
+* helpful error messages when arguments are missing ([cb5266a](https://github.com/target-ops/gitswitch/commit/cb5266a9ecb871dbfa63310f639433448e216c77))
+
 ## [1.1.0](https://github.com/target-ops/gitswitch/compare/v1.0.2...v1.1.0) (2026-05-01)
 
 
