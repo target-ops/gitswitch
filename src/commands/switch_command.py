@@ -4,6 +4,7 @@ from click_help_colors import HelpColorsCommand
 from configs.config import load_config,set_current_user
 from configs.git import set_global_git_user
 from configs.ssh import update_ssh_config
+from configs.gh import switch_gh_user
 
 # @click.command(cls=HelpColorsCommand,help_options_color='green')
 # @click.option('-v','--vendor',required=True,type=click.Choice(["github", "gitlab"]), help='Vendor name')
@@ -45,10 +46,10 @@ def switch(vendor, username):
     config = load_config()
 
     if vendor is None:
-        vendors = list(config.keys())
-        if 'current' in vendors:
-            vendors.remove('DEFAULT')
-            vendors.remove('current')
+        vendors = [v for v in config.keys() if v not in ('DEFAULT', 'current')]
+        if not vendors:
+            click.secho("No users configured yet. Run `gitswitch add user` first.", fg='yellow')
+            return
 
         vendor_questions = [inquirer.List('vendor',message="Select a vendor",choices=vendors)]
         vendor_answers = inquirer.prompt(vendor_questions)
@@ -65,6 +66,8 @@ def switch(vendor, username):
             email, key_path = config[vendor][username].split(',')
             set_global_git_user(username, email)
             update_ssh_config(vendor, key_path)
+            if vendor == 'github':
+                switch_gh_user(username)
             set_current_user(config, vendor, username)
             click.secho("Switched to: " + click.style(username, fg="green"))
         else:
