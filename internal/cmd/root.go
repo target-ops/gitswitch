@@ -23,5 +23,6 @@ work to a company repo.`,
 	root.AddCommand(newDoctorCommand())
 	root.AddCommand(newInitCommand())
 	root.AddCommand(newUseCommand())
+	root.AddCommand(newGuardCommand())
 	return root
 }
