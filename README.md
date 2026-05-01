@@ -112,34 +112,11 @@ Once `guard` is installed, every `git commit` runs a ~5 ms check: does `user.ema
 
 ---
 
-## Why this exists
-
-There's a great, obscure git feature called `includeIf` that fixes the directory problem. Nobody documents it well; every blog post about it has a comment from someone who got bitten by the trailing-slash gotcha. Even when it's set up correctly, it doesn't help with SSH (which leaks every key in your agent to every server), and it doesn't help with the GitHub CLI (which has its own opinion about who you are). None of those layers will tell you when they silently disagree.
-
-`gitswitch` sets up `includeIf` correctly the first time, adds per-account SSH host aliases with `IdentitiesOnly yes`, keeps `gh auth` in lockstep, defaults to SSH commit signing so verified-badges come free, and **refuses to let you commit when any of the above is wrong for the directory you're in.**
-
-That last one is the thing.
-
----
-
 ## Philosophy
 
 Git identity should be **infrastructure**, not something you remember.
 
 The tool is small, the binary is single, the only state on your machine lives in `~/.config/gitswitch/` and the directories *you* tell it to manage. No service. No cloud sync of your keys. No telemetry. The maintainer is one developer who got bitten and built this; the issue tracker responds in days, not weeks; the roadmap is public; the tests pass.
-
----
-
-## Upgrading from v0.2.x
-
-The 0.2 line was a Python implementation; v1.0 is a single Go binary with a cleaner config layout.
-
-```bash
-brew upgrade gitswitch
-gitswitch init        # re-detect identities into the new JSON config
-```
-
-The legacy `~/.config.ini` from 0.2.x is left in place — delete it by hand once the new config works.
 
 ---
 
