@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.2](https://github.com/target-ops/gitswitch/compare/v1.1.1...v1.1.2) (2026-05-01)
+
+
+### Documentation
+
+* improve the demo — slower pacing, more content, clean ending ([2ab0491](https://github.com/target-ops/gitswitch/commit/2ab04912756eacb5db0f417e868cf7e30adf15c6))
+* record demo GIF and embed in README ([a55f626](https://github.com/target-ops/gitswitch/commit/a55f626f43a4f77772b0a89d7fd8978b871a787d))
+* record the demo GIF and embed it in the README ([28353db](https://github.com/target-ops/gitswitch/commit/28353db50d742a27a5cf63d4b45db5bfdaba42cc))
+
 ## [1.1.1](https://github.com/target-ops/gitswitch/compare/v1.1.0...v1.1.1) (2026-05-01)
 
 
