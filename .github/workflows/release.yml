@@ -1,15 +1,36 @@
 name: release
 
-# Fires on every annotated tag matching v*. The release notes header in
-# .goreleaser.yml expects this convention; one-off pre-releases work too.
+# Three triggers, all converge on the same GoReleaser run:
+#
+# 1. push.tags — manual `git push origin vX.Y.Z` from a maintainer's
+#    machine. Useful for quick out-of-band releases.
+#
+# 2. release.published — fires when GitHub creates a release. This is
+#    what release-please does at the end of its workflow. The
+#    `push.tags` trigger does NOT fire for tags created via the
+#    GITHUB_TOKEN (anti-loop safeguard), so this is the path that
+#    keeps the auto-release pipeline healthy.
+#
+# 3. workflow_dispatch — manual recovery. If a release got cut but
+#    the GoReleaser run never fired (or failed mid-way), an admin
+#    can re-run for a specific tag from the Actions UI without
+#    re-tagging.
 on:
   push:
     tags:
       - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (e.g. v1.0.1). Defaults to the workflow run ref.'
+        required: false
 
 permissions:
-  # Required so goreleaser can create the GitHub Release and upload assets.
-  # No write to anything else.
+  # Required so goreleaser can create / update the GitHub Release and
+  # upload assets. No write to anything else (the cross-repo brew push
+  # uses HOMEBREW_TAP_TOKEN, not GITHUB_TOKEN).
   contents: write
 
 jobs:
@@ -19,6 +40,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          # On workflow_dispatch with a tag input, check out that tag.
+          # Otherwise fall through to the workflow's natural ref
+          # (the tag for push/release events, default branch for
+          # bare manual dispatch).
+          ref: ${{ github.event.inputs.tag || github.ref }}
           # GoReleaser needs the full history to compute the changelog
           # since the previous tag.
           fetch-depth: 0
