@@ -45,5 +45,9 @@ work to a company repo.`,
 	root.AddCommand(newUseCommand())
 	root.AddCommand(newGuardCommand())
 	root.AddCommand(newWhyCommand())
+	root.AddCommand(newListCommand())
+	root.AddCommand(newAddCommand())
+	root.AddCommand(newDeleteCommand())
+	root.AddCommand(newRenameCommand())
 	return root
 }
