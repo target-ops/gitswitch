@@ -1,35 +1,11 @@
-config.ini
-__pycache__/
-*.rb
-# Byte-compiled / optimized / DLL files
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Go
+# Build output
+/gitswitch
+/dist
 *.test
 *.out
-/gitswitch
 vendor/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
