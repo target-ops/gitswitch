@@ -61,13 +61,22 @@ func IsEnabled() bool { return enabled }
 // the look stays coherent.
 
 var (
-	// Foundational colours. We use ANSI 16 for portability — every
-	// terminal renders these the same, no truecolor surprises.
-	colourSuccess = lipgloss.Color("2")  // green
-	colourError   = lipgloss.Color("1")  // red
-	colourWarn    = lipgloss.Color("3")  // yellow
-	colourAccent  = lipgloss.Color("4")  // blue
-	colourMuted   = lipgloss.Color("8")  // bright black (gray)
+	// Foundational colours. Truecolor hex values, picked from a
+	// saturated palette that pops on both dark and light terminals
+	// without needing AdaptiveColor's background-detection (which
+	// guesses wrong on terminals that don't expose the right escape
+	// sequence). Lipgloss downsamples truecolor automatically when
+	// the terminal supports only 256 / 16 colours, so this also
+	// degrades gracefully on older or restricted environments.
+	//
+	// Previous palette was the bare ANSI-16 (`"2"`, `"1"`, etc.),
+	// which on modern dark themes reads as muted dim grey rather
+	// than the punchy semantic signal we want.
+	colourSuccess = lipgloss.Color("#22c55e") // emerald-500
+	colourError   = lipgloss.Color("#ef4444") // red-500
+	colourWarn    = lipgloss.Color("#f59e0b") // amber-500
+	colourAccent  = lipgloss.Color("#3b82f6") // blue-500
+	colourMuted   = lipgloss.Color("#9ca3af") // gray-400 — readable but recessive
 
 	successStyle = lipgloss.NewStyle().Foreground(colourSuccess).Bold(true)
 	errorStyle   = lipgloss.NewStyle().Foreground(colourError).Bold(true)

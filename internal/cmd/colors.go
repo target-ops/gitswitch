@@ -36,12 +36,24 @@ func disableColors() {
 	green, yellow, red, blue, dim, bold, reset = "", "", "", "", "", "", ""
 }
 
-// enableColors sets the standard ANSI prefixes/suffix.
+// enableColors sets truecolor (24-bit) ANSI escapes for our palette.
+// Hex → r;g;b mappings match internal/style:
+//
+//	#22c55e (emerald-500) → 34;197;94
+//	#ef4444 (red-500)     → 239;68;68
+//	#f59e0b (amber-500)   → 245;158;11
+//	#3b82f6 (blue-500)    → 59;130;246
+//
+// Terminals that don't support truecolor downsample to 256 / 16
+// colour automatically — the punchy palette degrades gracefully.
+// Was previously bare ANSI-16 (\033[32m etc.) which on modern dark
+// themes reads as muted dim grey rather than the punchy semantic
+// signal we want.
 func enableColors() {
-	green = "\033[32m"
-	yellow = "\033[33m"
-	red = "\033[31m"
-	blue = "\033[34m"
+	green = "\033[38;2;34;197;94m"
+	yellow = "\033[38;2;245;158;11m"
+	red = "\033[38;2;239;68;68m"
+	blue = "\033[38;2;59;130;246m"
 	dim = "\033[2m"
 	bold = "\033[1m"
 	reset = "\033[0m"
