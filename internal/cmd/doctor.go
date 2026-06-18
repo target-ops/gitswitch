@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 
 	"github.com/target-ops/gitswitch/internal/gh"
 	"github.com/target-ops/gitswitch/internal/git"
+	"github.com/target-ops/gitswitch/internal/identity"
 	"github.com/target-ops/gitswitch/internal/ssh"
 )
 
@@ -84,24 +86,52 @@ func runDoctor(_ *cobra.Command, _ []string) error {
 		}
 	}
 
-	// 5. cross-check: do gh and ssh agree on who you are?
+	// 5. Is a gitswitch binding being silently shadowed by this repo's
+	// local .git/config? Local config wins over the includeIf (git
+	// precedence: local > global), so the binding can be defeated without
+	// any sign. Detect it so the summary below can't lie with "all agree".
+	var shadowOverrides []string
+	var shadowIdentity string
+	if cwd, err := os.Getwd(); err == nil {
+		if cfg, err := identity.Load(); err == nil {
+			if b := cfg.FindBindingForDir(cwd); b != nil {
+				if ov := git.LocalOverrides(""); len(ov) > 0 {
+					shadowOverrides = ov
+					shadowIdentity = b.Identity
+				}
+			}
+		}
+	}
+
+	// 6. cross-check + summary: shadowing first (the root cause), then
+	// gh-vs-ssh, then the all-clear.
 	ghLogin, _ := gh.ActiveLogin()
-	if ghLogin != "" && len(sshLogins) > 0 {
-		mismatch := false
+	mismatch := false
+	if ghLogin != "" {
 		for _, s := range sshLogins {
 			if s != "" && s != ghLogin {
 				mismatch = true
 			}
 		}
-		if mismatch {
-			fmt.Println()
-			fmt.Println(red + bold + "✗ identity mismatch" + reset)
-			fmt.Printf("  gh says you are:  %s\n", ghLogin)
-			fmt.Printf("  ssh says you are: %s\n", strings.Join(sshLogins, ", "))
-		} else {
-			fmt.Println()
-			fmt.Println(green + bold + "✓ all layers agree" + reset)
-		}
+	}
+	hasCrossCheck := ghLogin != "" && len(sshLogins) > 0
+
+	switch {
+	case len(shadowOverrides) > 0:
+		fmt.Println()
+		fmt.Println(yellow + bold + "⚠ binding shadowed by local .git/config" + reset)
+		fmt.Printf("  %q is bound to this directory, but these keys in this repo's\n", shadowIdentity)
+		fmt.Printf("  .git/config override it: %s%s%s\n", bold, strings.Join(shadowOverrides, ", "), reset)
+		fmt.Printf("  gitswitch isn't in control here. Take over with: %sgitswitch use %s .%s\n",
+			dim, shadowIdentity, reset)
+	case mismatch:
+		fmt.Println()
+		fmt.Println(red + bold + "✗ identity mismatch" + reset)
+		fmt.Printf("  gh says you are:  %s\n", ghLogin)
+		fmt.Printf("  ssh says you are: %s\n", strings.Join(sshLogins, ", "))
+	case hasCrossCheck:
+		fmt.Println()
+		fmt.Println(green + bold + "✓ all layers agree" + reset)
 	}
 	return nil
 }
