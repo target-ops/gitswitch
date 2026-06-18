@@ -97,15 +97,15 @@ func runUse(args []string, unbind bool) error {
 		return nil
 	}
 
-	// 2. Update ~/.gitconfig with an idempotent includeIf block.
+	// 2. Record the binding, then (re)write ~/.gitconfig with one
+	// includeIf block per directory bound to this identity. Keying the
+	// blocks per binding (not per identity) lets several directories
+	// share one identity without clobbering each other.
 	gitconfigPath := filepath.Join(os.Getenv("HOME"), ".gitconfig")
-	blockBody := buildIncludeIfBlock(dir, identity.GitconfigPath(name))
-	if err := blocks.Upsert(gitconfigPath, name, blockBody, 0o600); err != nil {
+	addBinding(cfg, name, dir)
+	if err := syncBindingBlocks(cfg, name, gitconfigPath); err != nil {
 		return fmt.Errorf("update ~/.gitconfig: %w", err)
 	}
-
-	// 3. Record the binding.
-	addBinding(cfg, name, dir)
 	if err := identity.Save(cfg); err != nil {
 		return err
 	}
@@ -235,7 +235,13 @@ func removeBinding(c *identity.Config, name, dir string) error {
 		if b.Directory == dir && b.Identity == name {
 			c.Bindings = append(c.Bindings[:i], c.Bindings[i+1:]...)
 			gitconfigPath := filepath.Join(os.Getenv("HOME"), ".gitconfig")
-			return blocks.Remove(gitconfigPath, name, 0o600)
+			// Drop this binding's own block, then rebuild the blocks for
+			// the identity's remaining directories (which also migrates
+			// any legacy bare-name block).
+			if err := blocks.Remove(gitconfigPath, bindingBlockName(name, dir), 0o600); err != nil {
+				return err
+			}
+			return syncBindingBlocks(c, name, gitconfigPath)
 		}
 	}
 	return fmt.Errorf("%s is not bound to %s", name, dir)

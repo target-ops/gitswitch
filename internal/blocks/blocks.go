@@ -99,11 +99,13 @@ func stripBlock(content, name string, m Marker) string {
 }
 
 func appendBlock(content, name, body string, m Marker) string {
-	if content != "" && !strings.HasSuffix(content, "\n") {
-		content += "\n"
-	}
-	if content != "" && !strings.HasSuffix(content, "\n\n") {
-		content += "\n"
+	// Normalise to exactly one blank line of separation before the block.
+	// Collapsing trailing newlines (rather than only ever adding them) is
+	// what keeps repeated strip+append cycles idempotent — otherwise every
+	// Upsert after a Remove would leak another blank line into the file.
+	content = strings.TrimRight(content, "\n")
+	if content != "" {
+		content += "\n\n"
 	}
 	open := fmt.Sprintf("%s >>> %s%s", m.CommentPrefix, m.OpenWord, name)
 	closeLine := fmt.Sprintf("%s <<< %s%s", m.CommentPrefix, m.OpenWord, name)
@@ -112,7 +114,11 @@ func appendBlock(content, name, body string, m Marker) string {
 }
 
 // blockPattern matches a full sentinel-wrapped block, including its
-// trailing newline if present. The (?s) flag lets `.` cross newlines.
+// trailing newline and any blank lines that follow it. Swallowing the
+// trailing blank separator is what keeps remove/re-add idempotent —
+// otherwise each strip would strand the blank line appendBlock inserted.
+// The (?s) flag lets `.` cross newlines; the trailing group matches only
+// blank lines, so it never eats into the next block or real config.
 func blockPattern(name string, m Marker) *regexp.Regexp {
 	cp := regexp.QuoteMeta(m.CommentPrefix)
 	ow := regexp.QuoteMeta(m.OpenWord + name)
@@ -120,6 +126,7 @@ func blockPattern(name string, m Marker) *regexp.Regexp {
 		`(?s)` +
 			`[ \t]*` + cp + `[ \t]*>>>[ \t]*` + ow + `[ \t]*\n` + // open line
 			`.*?` + // body, non-greedy
-			`[ \t]*` + cp + `[ \t]*<<<[ \t]*` + ow + `[ \t]*\n?`, // close line
+			`[ \t]*` + cp + `[ \t]*<<<[ \t]*` + ow + `[ \t]*\n?` + // close line
+			`(?:[ \t]*\n)*`, // any blank lines after the block
 	)
 }
