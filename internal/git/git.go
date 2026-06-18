@@ -54,6 +54,18 @@ func EffectiveEmail() (string, error) {
 	return configGet("user.email")
 }
 
+// EffectiveIdentity returns the user.name and user.email git would
+// actually use for the next commit in the current working directory.
+// Like EffectiveEmail, this respects local repo config and includeIf
+// chains (which is how gitswitch binds a directory to an identity);
+// outside a repo it falls back to the global values. Either string may
+// be empty if the corresponding config is unset.
+func EffectiveIdentity() (name, email string, err error) {
+	name, _ = configGet("user.name")
+	email, _ = configGet("user.email")
+	return name, email, nil
+}
+
 // SetGlobal writes a value into the user's global git config.
 func SetGlobal(key, value string) error {
 	return exec.Command("git", "config", "--global", key, value).Run()

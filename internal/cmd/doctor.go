@@ -28,9 +28,18 @@ my last commit go out as the right person?"`,
 }
 
 func runDoctor(_ *cobra.Command, _ []string) error {
-	// 1. git config
-	gitName, gitEmail, _ := git.GlobalIdentity()
-	row("git", strings.TrimSpace(fmt.Sprintf("%s <%s>", gitName, gitEmail)), gitName != "" && gitEmail != "")
+	// 1. git config — report the identity git will ACTUALLY commit as in
+	// this directory (respects local repo config and the includeIf blocks
+	// gitswitch writes), not just the global config. Surface the global
+	// value separately when a directory binding overrides it, so the
+	// switch is visible rather than silently hidden.
+	gitName, gitEmail, _ := git.EffectiveIdentity()
+	row("git (here)", renderIdentity(gitName, gitEmail), gitName != "" && gitEmail != "")
+
+	globalName, globalEmail, _ := git.GlobalIdentity()
+	if globalName != gitName || globalEmail != gitEmail {
+		row("git (global)", renderIdentity(globalName, globalEmail), globalName != "" && globalEmail != "")
+	}
 
 	// 2. ssh ~/.ssh/config Host blocks
 	blocks, err := ssh.ParseConfig()
