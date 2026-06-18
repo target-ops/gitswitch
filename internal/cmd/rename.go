@@ -70,12 +70,18 @@ func runRename(oldName, newName string) error {
 		}
 	}
 
-	// 2. Update the includeIf block in ~/.gitconfig — strip the old,
-	//    re-add under the new name pointing at the new path. Done by
-	//    finding any binding for the old name and re-applying it
-	//    under the new identity post-rename (we do that after JSON
-	//    update so we have the new identity in scope).
+	// 2. Strip the old includeIf blocks from ~/.gitconfig — one per
+	//    bound directory, plus the legacy bare-name block. We do this
+	//    before mutating the JSON, while bindings still reference the
+	//    old name.
 	gitconfigPath := filepath.Join(os.Getenv("HOME"), ".gitconfig")
+	for _, b := range cfg.Bindings {
+		if b.Identity == oldName {
+			if err := blocks.Remove(gitconfigPath, bindingBlockName(oldName, b.Directory), 0o600); err != nil {
+				return fmt.Errorf("strip old includeIf block: %w", err)
+			}
+		}
+	}
 	if err := blocks.Remove(gitconfigPath, oldName, 0o600); err != nil {
 		return fmt.Errorf("strip old includeIf block: %w", err)
 	}
@@ -92,16 +98,10 @@ func runRename(oldName, newName string) error {
 		}
 	}
 
-	// 4. Re-add the includeIf block under the new name for every dir
-	//    that's still bound to it.
-	for _, b := range cfg.Bindings {
-		if b.Identity != newName {
-			continue
-		}
-		body := buildIncludeIfBlock(b.Directory, identity.GitconfigPath(newName))
-		if err := blocks.Upsert(gitconfigPath, newName, body, 0o600); err != nil {
-			return fmt.Errorf("re-add includeIf block: %w", err)
-		}
+	// 4. Re-add the includeIf blocks under the new name, one per dir
+	//    still bound to it.
+	if err := syncBindingBlocks(cfg, newName, gitconfigPath); err != nil {
+		return fmt.Errorf("re-add includeIf block: %w", err)
 	}
 
 	if err := identity.Save(cfg); err != nil {

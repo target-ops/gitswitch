@@ -107,8 +107,15 @@ func runDelete(name string, assumeYes bool) error {
 		}
 	}
 
-	// 1. strip the includeIf block from ~/.gitconfig (no-op if not present)
+	// 1. strip the includeIf blocks from ~/.gitconfig — one per bound
+	// directory, plus the legacy bare-name block from older versions
+	// (all no-ops if not present).
 	gitconfigPath := filepath.Join(os.Getenv("HOME"), ".gitconfig")
+	for _, b := range refBindings {
+		if err := blocks.Remove(gitconfigPath, bindingBlockName(name, b.Directory), 0o600); err != nil {
+			return fmt.Errorf("strip includeIf block from ~/.gitconfig: %w", err)
+		}
+	}
 	if err := blocks.Remove(gitconfigPath, name, 0o600); err != nil {
 		return fmt.Errorf("strip includeIf block from ~/.gitconfig: %w", err)
 	}
