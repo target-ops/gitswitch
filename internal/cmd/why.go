@@ -79,22 +79,35 @@ func runWhy() error {
 
 	// Case 2 & 3 — render the resolved chain.
 	matches := strings.EqualFold(effective, id.Email)
-	if matches {
-		fmt.Println(green + bold + "✓ active identity: " + id.Name + reset)
-	} else {
+	// A repo's local .git/config wins over the includeIf (git precedence:
+	// local > global). When identity keys are set locally, the binding is
+	// being shadowed — even if the effective email happens to match, it's
+	// a coincidence, not the binding doing its job.
+	overrides := git.LocalOverrides("")
+	shadowed := len(overrides) > 0
+	switch {
+	case !matches:
 		fmt.Println(red + bold + "✗ identity drift" + reset)
+	case shadowed:
+		fmt.Println(yellow + bold + "⚠ binding shadowed by local .git/config" + reset)
+	default:
+		fmt.Println(green + bold + "✓ active identity: " + id.Name + reset)
 	}
 	fmt.Println()
 	fmt.Printf("  %scwd:%s               %s\n", dim, reset, cwd)
 	fmt.Printf("  %sbound directory:%s   %s\n", dim, reset, binding.Directory)
 
-	if matches {
-		fmt.Printf("  %suser.email:%s        %s   %s\n",
-			dim, reset, effective, green+"(matches binding ✓)"+reset)
-	} else {
+	switch {
+	case !matches:
 		fmt.Printf("  %suser.email:%s        %s   %s\n",
 			dim, reset, effective, red+"← MISMATCH"+reset)
 		fmt.Printf("  %sexpected:%s          %s\n", dim, reset, id.Email)
+	case shadowed:
+		fmt.Printf("  %suser.email:%s        %s   %s\n",
+			dim, reset, effective, yellow+"(from local .git/config, not the binding)"+reset)
+	default:
+		fmt.Printf("  %suser.email:%s        %s   %s\n",
+			dim, reset, effective, green+"(matches binding ✓)"+reset)
 	}
 
 	if id.GitName != "" {
@@ -116,6 +129,17 @@ func runWhy() error {
 			strings.TrimRight(binding.Directory, "/")))
 	fmt.Printf("  %sper-identity file:%s %s\n", dim, reset,
 		shortPath(identity.GitconfigPath(id.Name)))
+
+	if shadowed {
+		fmt.Println()
+		fmt.Println(yellow + bold + "⚠ this repo's local .git/config overrides the binding" + reset)
+		fmt.Printf("  %sset locally, so they win over the includeIf above:%s\n", dim, reset)
+		fmt.Printf("      %s%s%s\n", bold, strings.Join(overrides, ", "), reset)
+		fmt.Println()
+		fmt.Printf("  %sgitswitch isn't really in control here. Take over with:%s\n", dim, reset)
+		fmt.Printf("  %sgitswitch use %s %s%s\n", dim, id.Name, binding.Directory, reset)
+		fmt.Printf("  %s(it will offer to remove the local overrides)%s\n", dim, reset)
+	}
 
 	if !matches {
 		fmt.Println()
