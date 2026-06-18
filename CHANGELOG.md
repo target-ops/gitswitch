@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.3](https://github.com/target-ops/gitswitch/compare/v1.1.2...v1.1.3) (2026-06-18)
+
+
+### Bug Fixes
+
+* **doctor:** Merge pull request [#34](https://github.com/target-ops/gitswitch/issues/34) from target-ops/fix/doctor-effective-identity ([3a9f674](https://github.com/target-ops/gitswitch/commit/3a9f6744c23240715634e30a73068bf38199022a))
+* **doctor:** report effective per-directory identity, not just global ([3a9f674](https://github.com/target-ops/gitswitch/commit/3a9f6744c23240715634e30a73068bf38199022a))
+* **doctor:** report effective per-directory identity, not just global ([6431f25](https://github.com/target-ops/gitswitch/commit/6431f25da4704cfc1b95a4b440eeb9c9c1f1b083))
+
 ## [1.1.2](https://github.com/target-ops/gitswitch/compare/v1.1.1...v1.1.2) (2026-05-01)
 
 
