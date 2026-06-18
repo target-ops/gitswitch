@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/target-ops/gitswitch/compare/v1.2.0...v1.2.1) (2026-06-18)
+
+
+### Bug Fixes
+
+* **use,delete,rename:** support multiple directories per identity ([09355e9](https://github.com/target-ops/gitswitch/commit/09355e932cdc04ae6c707dcbcb96875f4086961c))
+* **use,delete,rename:** support multiple directories per identity ([17eb19d](https://github.com/target-ops/gitswitch/commit/17eb19df560b0fb1086b48ce364aea5fde638e4e))
+
 ## [1.2.0](https://github.com/target-ops/gitswitch/compare/v1.1.3...v1.2.0) (2026-06-18)
 
 
