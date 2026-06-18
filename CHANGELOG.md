@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/target-ops/gitswitch/compare/v1.1.3...v1.2.0) (2026-06-18)
+
+
+### Features
+
+* **doctor,why,use:** detect local .git/config shadowing a binding ([9c54811](https://github.com/target-ops/gitswitch/commit/9c548119c227f698bed9df9fe7fa8fa25bd35192))
+* **doctor,why,use:** detect local .git/config shadowing a binding ([3d3c04a](https://github.com/target-ops/gitswitch/commit/3d3c04aa99e75ebd3c746632b2b8159a03b46ff6))
+
 ## [1.1.3](https://github.com/target-ops/gitswitch/compare/v1.1.2...v1.1.3) (2026-06-18)
 
 
